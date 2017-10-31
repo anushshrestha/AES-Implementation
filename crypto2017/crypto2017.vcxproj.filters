@@ -35,5 +35,8 @@
     <ClCompile Include="shiftrows.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="subbytes.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
