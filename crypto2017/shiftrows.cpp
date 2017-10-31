@@ -7,9 +7,9 @@
 
 using namespace std;
 
-vector<vector<string>> ShiftRows(vector <vector <string>> state, int Nb)
+vector<vector<int>> ShiftRows(vector <vector <int>> state, int Nb)
 {
-	vector <string> temp;
+	vector <int> temp;
 	for (int row = 1; row < Nb; row++) {
 		for (int column = 0; column < Nb; column++) {
 			temp.push_back(state[row][(column+row)%Nb]);

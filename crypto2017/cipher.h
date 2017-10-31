@@ -3,4 +3,4 @@
 #include <string>
 using namespace std;
 
-vector<vector<string>> ShiftRows(vector <vector <string>> state, int Nb);
+vector<vector<int>> ShiftRows(vector <vector <int>> state, int Nb);
