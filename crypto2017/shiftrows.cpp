@@ -4,7 +4,6 @@
 #include <string>
 #include <vector>
 #include "stdio.h"
-
 using namespace std;
 
 vector<vector<int>> ShiftRows(vector <vector <int>> state, int Nb)
