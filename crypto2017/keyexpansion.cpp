@@ -17,3 +17,12 @@ vector <int> KeySubWord(vector <int> word)
 	}
 	return(word);
 }
+
+// Performs the RotWord function for KeyExpansion. The first byte in the integer is rotated
+// to the end.
+vector <int> KeyRotateWord(vector <int> keyWord)
+{
+	keyWord.push_back(keyWord[0]);
+	keyWord.erase(keyWord.begin());
+	return keyWord;
+}
