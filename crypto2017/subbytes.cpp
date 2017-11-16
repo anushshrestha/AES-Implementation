@@ -73,12 +73,12 @@ int mulInverse(int init) {
 		if (pos1 <= pos2) {//if position of dividend is greater than the position of the divisor, divisor has to be multiplied (or shifted, in case of binary)
 			q1 = q1 << (pos2 - pos1); //Finding quotient for the first xor
 			int temp2 = init << (pos2 - pos1);
-			temp = temp^temp2;
+			temp = temp^temp2;//xor the values to get the remainer (Here, temp is the remainder)
 		}
-		else {
+		else {//here we are trying to calculate the intermediate inverse of the function using quotients
 			int random = prev;
-			prev = present;
-			present = productInFiniteField(present, q);
+			prev = present;//storing previous intermediate inverse
+			present = productInFiniteField(present, q); //product in finite field to get the new intermediate inverse
 			present = random ^ present;
 			int temporary = temp;
 			temp = init;
@@ -90,22 +90,23 @@ int mulInverse(int init) {
 	}
 	int random = prev;
 	prev = present;
-	present = productInFiniteField(present, q);
-
+	present = productInFiniteField(present, q);//finding the final inverse by finding the product in finite field and xoring it with the previous intermediate inverse.
 	present = random ^ present;
 	return present;
 }
 int affineTrans(int k) {
+	if (k == 0x11a) {//since 01 doesn't have an inverse that can be represented in 8 bits.
+		return 0x7c;
+	}
 	int i = 0, j = 0;
 	bitset<8> prod, finalVal = 0;
-
 	bitset<8> affineConstBit = affineConst;
 	bitset<8> value = k;
 	prod = value;
-	for (int i = 0; i < 8; i++) {
+	for (int i = 0; i < 8; i++) {//reversing the bits for easy calculation
 		value[7 - i] = prod[i];
 	}
-	while (i < 8) {
+	while (i < 8) {//Affine transformation done here. Matrix multiplication+ addition of the matrix
 		prod = affineConstBit & value;
 		while (j < 8) {
 			finalVal[i] = finalVal[i] ^ prod[j];
@@ -135,7 +136,7 @@ void byteSub() {
 		if (i % 16 == 0) {
 			cout << endl;
 		}
-		state[i] = affineTrans(mulInverse(i));
+		state[i] = affineTrans(mulInverse(i));//generating state here using sbox
 		cout << std::hex << state[i] << " ";
 	}
 }
