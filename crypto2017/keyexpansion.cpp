@@ -9,74 +9,101 @@
 using namespace std;
 
 // Performs the SubWord substitution for KeyExpansion. 
-vector <int> KeySubWord(vector <int> word)
+int KeySubWord(int word)
 {
-	for (int row = 0; row < 4; row++) {
-		word[row] = sbox[word[row] >> 4][word[row] & 0x0F];
-		cout << hex << word[row] << ' ';
-	}
+	int result;
+	result = (int)sbox[(word >> 4) & 0x0000000F][word & 0x0000000F];
+	result += (int)sbox[(word >> 12) & 0x0000000F][(word >> 8) & 0x0000000F] << 8;
+	result += (int)sbox[(word >> 20) & 0x0000000F][(word >> 16) & 0x0000000F] << 16;
+	result += (int)sbox[(word >> 28) & 0x0000000F][(word >> 24) & 0x0000000F] << 24;
+
 	return(word);
 }
 
 // Performs the RotWord function for KeyExpansion. The first byte in the integer is rotated
 // to the end.
-vector <int> KeyRotateWord(vector <int> keyWord)
+int KeyRotateWord(int keyWord)
 {
-	keyWord.push_back(keyWord[0]);
-	keyWord.erase(keyWord.begin());
-	return keyWord;
+	return ((keyWord) << 8) | ((keyWord) >> 24);
 }
 
-vector<vector<int>> KeyExpansion(vector <int> key, int Nb)
+int * KeyExpansion(int * key, int keysize)
 {
-	const vector <vector <int>> Rcon = {
-		{ 0x01, 0x00, 0x00, 0x00 },
-		{ 0x02, 0x00, 0x00, 0x00 },
-		{ 0x04, 0x00, 0x00, 0x00 },
-		{ 0x08, 0x00, 0x00, 0x00 },
-		{ 0x10, 0x00, 0x00, 0x00 },
-		{ 0x20, 0x00, 0x00, 0x00 },
-		{ 0x40, 0x00, 0x00, 0x00 },
-		{ 0x80, 0x00, 0x00, 0x00 },
-		{ 0x1b, 0x00, 0x00, 0x00 },
-		{ 0x36, 0x00, 0x00, 0x00 }
+	//const vector <vector <int>> Rcon = {
+	//	{ 0x01, 0x00, 0x00, 0x00 },
+	//	{ 0x02, 0x00, 0x00, 0x00 },
+	//	{ 0x04, 0x00, 0x00, 0x00 },
+	//	{ 0x08, 0x00, 0x00, 0x00 },
+	//	{ 0x10, 0x00, 0x00, 0x00 },
+	//	{ 0x20, 0x00, 0x00, 0x00 },
+	//	{ 0x40, 0x00, 0x00, 0x00 },
+	//	{ 0x80, 0x00, 0x00, 0x00 },
+	//	{ 0x1b, 0x00, 0x00, 0x00 },
+	//	{ 0x36, 0x00, 0x00, 0x00 }
+	//};
+	int Nb = 4, Nr, Nk, idx, temp;
+	int Rcon[] = {
+		0x01,0x02,0x04,0x08,
+		0x10,0x20,0x40,0x80,
+		0x1b,0x36,0x6c,0xd8,
+		0xab,0x4d,0x9a
 	};
 
-	int Nk = key.size() / 4; // key length (in words): 4/6/8 for 128/192/256-bit keys
-	int Nr = Nk + 6;       // no of rounds: 10/12/14 for 128/192/256-bit keys
-
-	vector <vector <int>> expandedKey(Nb, vector <int>(Nb*(Nr + 1), 0));
-	vector <int> temp(Nk, 0);
-	int counter = 0;
-
-	// initialise first Nk words of expanded key with cipher key
-	for (counter = 0; counter < Nk; counter++) {
-		vector <int> r = { key[4 * counter], key[4 * counter + 1], key[4 * counter + 2], key[4 * counter + 3] };
-		expandedKey[counter] = r;
+	switch (keysize) {
+	case 128: Nr = 10; Nk = 4; break;
+		//case 192: Nr = 12; Nk = 6; break;
+		//case 256: Nr = 14; Nk = 8; break;
+	default: return;
 	}
 
-	// expand the key into the remainder of the schedule
-	for (counter = Nk; counter < Nb * (Nr + 1); ++counter) {
-		vector <int> word(Nb*(Nr + 1), 0);
-		temp = expandedKey[counter - 1];
+	int w[44];
+	for (idx = 0; idx < Nk; ++idx) {
+		w[idx] = ((key[4 * idx]) << 24) | ((key[4 * idx + 1]) << 16) |
+			((key[4 * idx + 2]) << 8) | ((key[4 * idx + 3]));
+	}
 
-		// each Nk'th word has extra transformation
-		if ((counter % Nk) == 0) {
-			temp = KeySubWord(KeyRotateWord(temp));
-			for (int t = 0; t < 4; t++) {
-				temp[t] ^= Rcon[(counter - 1) / Nk][t];
-			}
-		}
-		// 256-bit key has subWord applied every 4th word
-		else if (Nk > 6 && (counter % Nk) == 4) {
+	for (idx = Nk; idx < Nb * (Nr + 1); ++idx) {
+		temp = w[idx - 1];
+		if ((idx % Nk) == 0)
+			temp = KeySubWord(KeyRotateWord(temp)) ^ Rcon[(idx - 1) / Nk];
+		else if (Nk > 6 && (idx % Nk) == 4)
 			temp = KeySubWord(temp);
-		}
-
-		vector <int> newKey;
-		for (int t = 0; t < Nk; t++) {
-			newKey.push_back(expandedKey[counter - Nk][t] ^ temp[t]);
-		}
-		expandedKey.push_back(newKey);
+		w[idx] = w[idx - Nk] ^ temp;
 	}
-	return expandedKey;
+
+	//vector <vector <int>> expandedKey(Nb, vector <int>(Nb*(Nr + 1), 0));
+	//vector <int> temp(Nk, 0);
+	//int counter = 0;
+
+	//// initialise first Nk words of expanded key with cipher key
+	//for (counter = 0; counter < Nk; counter++) {
+	//	vector <int> r = { key[4 * counter], key[4 * counter + 1], key[4 * counter + 2], key[4 * counter + 3] };
+	//	expandedKey[counter] = r;
+	//}
+
+	//// expand the key into the remainder of the schedule
+	//for (counter = Nk; counter < Nb * (Nr + 1); ++counter) {
+	//	vector <int> word(Nb*(Nr + 1), 0);
+	//	temp = expandedKey[counter - 1];
+
+	//	// each Nk'th word has extra transformation
+	//	if ((counter % Nk) == 0) {
+	//		temp = KeySubWord(KeyRotateWord(temp));
+	//		for (int t = 0; t < 4; t++) {
+	//			temp[t] ^= Rcon[(counter - 1) / Nk][t];
+	//		}
+	//	}
+	//	// 256-bit key has subWord applied every 4th word
+	//	else if (Nk > 6 && (counter % Nk) == 4) {
+	//		temp = KeySubWord(temp);
+	//	}
+
+	//	vector <int> newKey;
+	//	for (int t = 0; t < Nk; t++) {
+	//		newKey.push_back(expandedKey[counter - Nk][t] ^ temp[t]);
+	//	}
+	//	expandedKey.push_back(newKey);
+	//}
+
+	return w;
 }
