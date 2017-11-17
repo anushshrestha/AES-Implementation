@@ -145,12 +145,14 @@
   <ItemGroup>
     <ClInclude Include="cipher.h" />
     <ClInclude Include="keyexpansion.h" />
+    <ClInclude Include="mixColumns.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="crypto2017.cpp" />
     <ClCompile Include="keyexpansion.cpp" />
+    <ClCompile Include="mixColumns.cpp" />
     <ClCompile Include="shiftrows.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
