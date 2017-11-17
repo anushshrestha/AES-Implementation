@@ -1,11 +1,11 @@
-#include "stdafx.h"
-#include <iostream>
-#include "stdint.h"
 #include <string>
 #include <vector>
 #include "stdio.h"
-#include "keyexpansion.h"
+#include "stdafx.h"
+#include "stdint.h"
+#include <iostream>
 #include "cipher.h"
+#include "keyexpansion.h"
 using namespace std;
 
 int Rcon[255] = {
