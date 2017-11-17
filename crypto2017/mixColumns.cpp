@@ -31,9 +31,8 @@ int FindMod(int prod) {//This finds mod invertible polynomial (x^8+x^4+x^3+x+1)
 }
 int ProductInFiniteField(int num1, int num2) {//multiplication of two numbers in binary and finite field
 	bitset<8> num_1 = num1;
-	bitset<8> num_2 = num2;
+	bitset<16> num_2 = num2;
 	bitset<16> prod = 0;
-	bitset<16> temp = num2;
 	int i = 7;
 	while (i >= 0) {
 		if (num_1[i] == 1) {//this is binary multiplication
