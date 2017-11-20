@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include "stdio.h"
+#include "cipher.h"
 using namespace std;
 
 void ShiftRows(int state[][4])

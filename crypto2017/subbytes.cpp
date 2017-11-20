@@ -3,6 +3,7 @@
 #include <bitset>
 #include "stdafx.h"
 #include <iostream>
+#include "cipher.h"
 using namespace std;
 
 int sbox[256] = {
@@ -158,7 +159,7 @@ void byteSub() {
 }
 
 
-void SubBytes(int ** state, int Nb)
+void SubBytes(int state[][4])
 {
 	int k = mulInverse(0x10);
 	bitset<8> kk = k;
