@@ -3,10 +3,9 @@
 
 #include <bitset>
 using namespace std;
-int state[4][4] = { { 1, 2,3,4 },{ 1, 2,3,4 },{ 1, 3,3,4 },{ 1, 2,3,4 } };
-int mulMatrix[4] = { 2,3,1,1 };
-int modVal = 0x11b;
-int position(int value) {
+int mulMatrix[4] = { 2,3,1,1 }; //Constant matrix/polynomial (AES standard)
+int modVal = 0x11b; // Invertible polynomial (AES standard)
+int position(int value) {//returns the position of 1 in the number (calculates from MSB)
 	int count = 8;
 	bitset <9> x = value;
 	while (count >= 0) {
@@ -15,14 +14,11 @@ int position(int value) {
 		}
 		count--;
 	}
-	return (count);
+	return (count);//The compiler reaches here iff value is 0
 }
-int FindMod(int prod) {
+int FindMod(int prod) {//This finds mod invertible polynomial (x^8+x^4+x^3+x+1)
 	if (modVal > prod) {
 		return prod;
-	}
-	if (modVal == prod) {
-		return 0;
 	}
 	int posMod = position(modVal);
 	int posProd = position(prod);
@@ -31,16 +27,15 @@ int FindMod(int prod) {
 		temp = prod ^ (modVal << (posProd - posMod));
 		posProd = position(temp);
 	}
-	return temp;
+	return temp;//returns after finding mod
 }
-int ProductInFiniteField(int num1, int num2) {
+int ProductInFiniteField(int num1, int num2) {//multiplication of two numbers in binary and finite field
 	bitset<8> num_1 = num1;
-	bitset<8> num_2 = num2;
+	bitset<16> num_2 = num2;
 	bitset<16> prod = 0;
-	bitset<16> temp = num2;
 	int i = 7;
 	while (i >= 0) {
-		if (num_1[i] == 1) {
+		if (num_1[i] == 1) {//this is binary multiplication
 			temp = num2 << i;
 			prod = prod ^ temp;
 		}
@@ -49,17 +44,17 @@ int ProductInFiniteField(int num1, int num2) {
 	return (int)(prod.to_ulong());
 }
 
-void mixColumns() {
+void mixColumns(int state[][4]) {//Mix Columns methods
 	int count = 0;
 	for (int i = 0; i < 4; i++) {
 		for (int j = 0; j < 4; j++) {
 			int temp = 0;
 			for (int k = 0; k < 4; k++) {
-				temp = temp ^ ProductInFiniteField(state[k][j], mulMatrix[count]);
-				count = (count + 1) % 4;
+				temp = temp ^ ProductInFiniteField(state[k][j], mulMatrix[count]);//multiplying the matrices and xor-ing them to find one state
+				count = (count + 1) % 4;// rotation, so that count doesn't go out of bounds.
 			}
 			state[i][j] = FindMod(temp);
-			count = (count + 1) % 4;
+			count = (count + 1) % 4;//increasing the count by 1 for the next round
 		}
 	}
 }

@@ -1,10 +1,12 @@
-#include "stdafx.h"
 #include <string>
 #include <vector>
+#include <bitset>
+#include "stdafx.h"
 #include <iostream>
+#include "cipher.h"
 using namespace std;
 
-int sbox[16][16] = {
+int sbox[256] = {
 	0x63,0x7C,0x77,0x7B,0xF2,0x6B,0x6F,0xC5,0x30,0x01,0x67,0x2B,0xFE,0xD7,0xAB,0x76,
 	0xCA,0x82,0xC9,0x7D,0xFA,0x59,0x47,0xF0,0xAD,0xD4,0xA2,0xAF,0x9C,0xA4,0x72,0xC0,
 	0xB7,0xFD,0x93,0x26,0x36,0x3F,0xF7,0xCC,0x34,0xA5,0xE5,0xF1,0x71,0xD8,0x31,0x15,
@@ -23,22 +25,24 @@ int sbox[16][16] = {
 	0x8C,0xA1,0x89,0x0D,0xBF,0xE6,0x42,0x68,0x41,0x99,0x2D,0x0F,0xB0,0x54,0xBB,0x16
 };
 
-int irreducable = 0x11B;
-int affineConst = 143;
 int addVar = 198;
-bool firstTime = true;
 int sBox[256] = { 0 };
+bool firstTime = true;
+int affineConst = 143;
+int irreducable = 0x11B;
 int state[256] = { 0x01, 0x01, 0x02 };
+
 int productInFiniteField(int num1, int num2) {
-	bitset<8> num_1 = num1;
-	bitset<16> num_2 = num2;
-	bitset<16> prod = 0;
+
 	int i = 7;
 	int product = 0;
+	bitset<16> prod = 0;
+	bitset<8> num_1 = num1;
+	bitset<16> num_2 = num2;
+
 	while (i >= 0) {
 		if (num_1[i] == 1) {
 			prod = prod ^ (num_2 << i);
-
 		}
 		i--;
 	}
@@ -49,6 +53,7 @@ int productInFiniteField(int num1, int num2) {
 int position(int value) {
 	int count = 8;
 	bitset <9> x = value;
+
 	while (count >= 0) {
 		if (x[count] == 1) {
 			return count;
@@ -57,14 +62,17 @@ int position(int value) {
 	}
 	return (count);
 }
+
 int mulInverse(int init) {
 	if (init == 0) {
 		return 0;
 	}
+
 	int temp = irreducable;
 	int q = 0;
 	int prev = 0;
 	int present = 1;
+
 	while (temp > 1) {
 		int q1 = 1;
 		int pos1 = position(init);//finding position of first 1 in the divisor
@@ -73,12 +81,12 @@ int mulInverse(int init) {
 		if (pos1 <= pos2) {//if position of dividend is greater than the position of the divisor, divisor has to be multiplied (or shifted, in case of binary)
 			q1 = q1 << (pos2 - pos1); //Finding quotient for the first xor
 			int temp2 = init << (pos2 - pos1);
-			temp = temp^temp2;
+			temp = temp^temp2;//xor the values to get the remainer (Here, temp is the remainder)
 		}
-		else {
+		else {//here we are trying to calculate the intermediate inverse of the function using quotients
 			int random = prev;
-			prev = present;
-			present = productInFiniteField(present, q);
+			prev = present;//storing previous intermediate inverse
+			present = productInFiniteField(present, q); //product in finite field to get the new intermediate inverse
 			present = random ^ present;
 			int temporary = temp;
 			temp = init;
@@ -88,25 +96,31 @@ int mulInverse(int init) {
 		}
 		q += q1;
 	}
+
 	int random = prev;
 	prev = present;
-	present = productInFiniteField(present, q);
-
+	present = productInFiniteField(present, q);//finding the final inverse by finding the product in finite field and xoring it with the previous intermediate inverse.
 	present = random ^ present;
 	return present;
 }
 int affineTrans(int k) {
+	if (k == 0x11a) {//since 01 doesn't have an inverse that can be represented in 8 bits.
+		return 0x7c;
+	}
+
 	int i = 0, j = 0;
 	bitset<8> prod, finalVal = 0;
-
 	bitset<8> affineConstBit = affineConst;
 	bitset<8> value = k;
 	prod = value;
-	for (int i = 0; i < 8; i++) {
+
+	for (int i = 0; i < 8; i++) {//reversing the bits for easy calculation
 		value[7 - i] = prod[i];
 	}
-	while (i < 8) {
+
+	while (i < 8) {//Affine transformation done here. Matrix multiplication+ addition of the matrix
 		prod = affineConstBit & value;
+
 		while (j < 8) {
 			finalVal[i] = finalVal[i] ^ prod[j];
 			j++;
@@ -118,16 +132,20 @@ int affineTrans(int k) {
 		affineConstBit[7] = temp;
 		i++;
 	}
+
 	prod = finalVal;
 	for (int i = 0; i < 8; i++) {
 		finalVal[7 - i] = prod[i];
 	}
+
 	bitset<8> addVarBit = addVar;
 	finalVal = finalVal ^ addVarBit;
 	prod = finalVal;
+
 	for (int i = 0; i < 8; i++) {
 		finalVal[7 - i] = prod[i];
 	}
+
 	return (int)(finalVal.to_ulong());
 }
 void byteSub() {
@@ -135,23 +153,14 @@ void byteSub() {
 		if (i % 16 == 0) {
 			cout << endl;
 		}
-		state[i] = affineTrans(mulInverse(i));
+		state[i] = affineTrans(mulInverse(i));//generating state here using sbox
 		cout << std::hex << state[i] << " ";
 	}
 }
 
 
-void SubBytes(int ** state, int Nb)
+void SubBytes(int state[][4])
 {
-
-	//vector <int> temp;
-	//for (int row = 0; row < Nb; row++) {
-	//	for (int column = 0; column < Nb; column++) {
-	//		// Left shift by 4 bits gives row and masking gives column 
-	//		state[row][column] = sbox[state[row][column] >> 4][state[row][column] & 0x0F];
-	//	}
-	//}
-
 	int k = mulInverse(0x10);
 	bitset<8> kk = k;
 	int r = affineTrans(k);
@@ -159,5 +168,4 @@ void SubBytes(int ** state, int Nb)
 	m = 44;
 	byteSub();
 	cin >> m;
-	return 0;
 }
