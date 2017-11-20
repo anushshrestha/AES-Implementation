@@ -44,7 +44,7 @@ int ProductInFiniteField(int num1, int num2) {//multiplication of two numbers in
 	return (int)(prod.to_ulong());
 }
 
-void mixColumns() {//Mix Columns methods
+void mixColumns(int state[][4]) {//Mix Columns methods
 	int count = 0;
 	for (int i = 0; i < 4; i++) {
 		for (int j = 0; j < 4; j++) {
