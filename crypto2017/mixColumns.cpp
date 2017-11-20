@@ -36,7 +36,7 @@ int ProductInFiniteField(int num1, int num2) {//multiplication of two numbers in
 	int i = 7;
 	while (i >= 0) {
 		if (num_1[i] == 1) {//this is binary multiplication
-			temp = num2 << i;
+			bitset<16> temp = num2 << i;
 			prod = prod ^ temp;
 		}
 		i--;
