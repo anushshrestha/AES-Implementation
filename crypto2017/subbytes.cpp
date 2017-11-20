@@ -149,12 +149,12 @@ int affineTrans(int k) {
 	return (int)(finalVal.to_ulong());
 }
 void SubBytes(int state[][4]) {
-	for (int i = 0; i < 16; i++) {
+	for (int i = 0; i < 4; i++) {
 		/*if (i % 16 == 0) {
 			cout << endl;
 		}*/
-		for (int j = 0; j < 16; j++) {
-			state[i][j] = affineTrans(mulInverse(i));//generating state here using sbox
+		for (int j = 0; j < 4; j++) {
+			state[i][j] = affineTrans(mulInverse(state[i][j]));//generating state here using sbox
 			//cout << std::hex << state[i][j] << " ";
 		}
 		cout << endl;
