@@ -36,10 +36,10 @@ void rotateWord(int * word) {
 }
 
 void substituteWord(int * word) {
-	word[0] = sbox[word[0]];
-	word[1] = sbox[word[1]];
-	word[2] = sbox[word[2]];
-	word[3] = sbox[word[3]];
+	word[0] = sBoxGen(word[0]);
+	word[1] = sBoxGen(word[1]);
+	word[2] = sBoxGen(word[2]);
+	word[3] = sBoxGen(word[3]);
 }
 
 int * KeyExpansion(int * key, int keysize) {
