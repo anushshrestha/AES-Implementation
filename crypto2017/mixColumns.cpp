@@ -6,7 +6,7 @@
 using namespace std;
 int mulMatrix[4] = { 2,3,1,1 }; //Constant matrix/polynomial (AES standard)
 int modVal = 0x11b; // Invertible polynomial (AES standard)
-int positionOfOne(int value) {//returns the position of 1 in the number (calculates from MSB)
+int position(int value) {//returns the position of 1 in the number (calculates from MSB)
 	int count = 8;
 	bitset <9> x = value;
 	while (count >= 0) {
@@ -21,12 +21,12 @@ int FindMod(int prod) {//This finds mod invertible polynomial (x^8+x^4+x^3+x+1)
 	if (modVal > prod) {
 		return prod;
 	}
-	int posMod = positionOfOne(modVal);
-	int posProd = positionOfOne(prod);
+	int posMod = position(modVal);
+	int posProd = position(prod);
 	int temp = 0;
 	while (posProd >= posMod) {
 		temp = prod ^ (modVal << (posProd - posMod));
-		posProd = positionOfOne(temp);
+		posProd = position(temp);
 	}
 	return temp;//returns after finding mod
 }
