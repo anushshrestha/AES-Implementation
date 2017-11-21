@@ -50,19 +50,6 @@ int productInFiniteField(int num1, int num2) {
 }
 
 
-int position(int value) {
-	int count = 8;
-	bitset <9> x = value;
-
-	while (count >= 0) {
-		if (x[count] == 1) {
-			return count;
-		}
-		count--;
-	}
-	return (count);
-}
-
 int mulInverse(int init) {
 	if (init == 0) {
 		return 0;

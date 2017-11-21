@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "cipher.h"
 #include <iostream>
 
 #include <bitset>
