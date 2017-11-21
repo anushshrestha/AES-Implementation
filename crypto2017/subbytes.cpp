@@ -26,7 +26,7 @@ using namespace std;
 //};
 
 int addVar = 198;
-int sBox[256] = { 0 };
+//int sBox[256] = { 0 };
 bool firstTime = true;
 int affineConst = 143;
 int irreducable = 0x11B;
