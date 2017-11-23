@@ -142,7 +142,7 @@ void SubBytes(int state[][4]) {
 			state[i][j] = sBoxGen(state[i][j]);
 			//cout << std::hex << state[i][j] << " ";
 		}
-		cout << endl;
+		//cout << endl;
 	}
 }
 
