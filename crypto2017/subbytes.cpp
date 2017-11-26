@@ -7,10 +7,13 @@
 using namespace std;
 
 int addVar = 198;
-bool firstTime = true;
+//affineConst:Matrix to be added to the intermediate generated sBox
 int affineConst = 143;
+//(AES standard) Irreducable polynomial (x^8+x^4+x^3+x+1)
 int irreducable = 0x11B;
 
+//Takes two integer inputs and computes multiplication
+//Computes multiplication of two numbers in finite field
 int productInFiniteField(int num1, int num2) {
 
 	int i = 7;
@@ -27,24 +30,24 @@ int productInFiniteField(int num1, int num2) {
 	}
 	return (int)(prod.to_ulong());
 }
-
-
+//takes one integer input
+//finds the multiplication inverse in 2^8 galois field
 int mulInverse(int init) {
 	if (init == 0) {
 		return 0;
 	}
 
-	int temp = irreducable;
+	int remainder = irreducable;
 	int q = 0;
 	int prev = 0;
 	int present = 1;
-
-	while (temp > 1) {
+	//Until the remainder is 1, this while loop runs
+	while (remainder > 1) {
 		int q1 = 1;
 		// finding position of first 1 in the divisor
 		int pos1 = position(init);
 		// finding position of first 1 in the divident
-		int pos2 = position(temp);
+		int pos2 = position(remainder);
 
 		// if position of dividend(pos2) is greater than the position of the divisor (pos1), 
 		// divisor has to be multiplied (or shifted, in case of binary)
@@ -53,7 +56,7 @@ int mulInverse(int init) {
 			q1 = q1 << (pos2 - pos1);
 			int temp2 = init << (pos2 - pos1);
 			// xor the values to get the remainer (Here, temp is the remainder)
-			temp = temp^temp2;
+			remainder = remainder^temp2;
 		}
 		else {
 			// calculate the intermediate inverse of the function using quotients
@@ -63,8 +66,8 @@ int mulInverse(int init) {
 			// product in finite field to get the new intermediate inverse
 			present = productInFiniteField(present, q);
 			present = random ^ present;
-			int temporary = temp;
-			temp = init;
+			int temporary = remainder;
+			remainder = init;
 			init = temporary;
 			q1 = 0;
 			q = 0;
@@ -72,13 +75,15 @@ int mulInverse(int init) {
 		q += q1;
 	}
 
-	int random = prev;
+	int prevTemp = prev;
 	prev = present;
 	// final inverse by finding product in finite field and xoring it with the previous intermediate inverse.
 	present = productInFiniteField(present, q);
-	present = random ^ present;
+	present = prevTemp ^ present;
 	return present;
 }
+//takes one input
+//Bitwise Matrix multiplication and addition of the matrix
 int affineTrans(int k) {
 	// 01 doesn't have an inverse that can be represented in 8 bits.
 	if (k == 0x11a) {
@@ -127,22 +132,19 @@ int affineTrans(int k) {
 
 	return (int)(finalVal.to_ulong());
 }
-
+//Takes 1 integer input
+// generates s box transformation for that input
+// returns the S Box transformation Value
 int sBoxGen(int value) {
 	return affineTrans(mulInverse(value));
 }
-
+//Finds sBox transformation for every value in the 4X4 state matrix
 void SubBytes(int state[][4]) {
 	for (int i = 0; i < 4; i++) {
-		/*if (i % 16 == 0) {
-			cout << endl;
-		}*/
 		for (int j = 0; j < 4; j++) {
 			// generating state using sbox
 			state[i][j] = sBoxGen(state[i][j]);
-			//cout << std::hex << state[i][j] << " ";
 		}
-		//cout << endl;
 	}
 }
 
