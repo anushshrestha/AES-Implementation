@@ -69,17 +69,12 @@ void mixColumns(int state[][4]) {
 		}
 	}
 }
-//int main() {
-//	mixColumns();
-//	for (int i = 0; i < 4; i++) {
-//		for (int j = 0; j < 4; j++) {
-//
-//			state[i][j] = FindMod(state[i][j]);
-//			std::cout <<hex<< state[i][j] << " ";
-//		}
-//		std::cout << endl;
-//	}
-//	int m;
-//	cin >> m;
-//	return 0;
-//}
+
+void AddRoundKey(int state[][4], int * roundKey, int round) {
+
+	for (int i = 0; i < Nb; ++i) {
+		for (int j = 0; j < Nb; ++j) {
+			state[j][i] ^= roundKey[round * Nb * 4 + i * Nb + j];
+		}
+	}
+}

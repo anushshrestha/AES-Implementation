@@ -5,7 +5,7 @@
 #include "stdint.h"
 #include <iostream>
 #include "cipher.h"
-#include "keyexpansion.h"
+
 using namespace std;
 
 // making it global
@@ -49,7 +49,6 @@ int * KeyExpansion(int * key, int keysize) {
 	
 	int i, j;
 	int word[4];
-	int Nb = 4, Nr = 10, Nk = 4;
 
 	// The first round key is the key itself.
 	for (i = 0; i < Nk; i++) {
