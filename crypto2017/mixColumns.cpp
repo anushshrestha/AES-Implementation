@@ -70,11 +70,13 @@ void mixColumns(int state[][4]) {
 	}
 }
 
+// xor the roundkey to the current state 
+// takes as input the round number and the state and the expanded key
+// modify the state with the result
 void AddRoundKey(int state[][4], int * roundKey, int round) {
-
-	for (int i = 0; i < Nb; ++i) {
-		for (int j = 0; j < Nb; ++j) {
-			state[j][i] ^= roundKey[round * Nb * 4 + i * Nb + j];
+	for (int col = 0; col < Nb; ++col) {
+		for (int row = 0; row < Nb; ++row) {
+			state[row][col] ^= roundKey[round * Nb * 4 + col * Nb + row];
 		}
 	}
 }
