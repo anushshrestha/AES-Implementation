@@ -6,7 +6,7 @@
 using namespace std;
 //Constant matrix/polynomial (AES standard)
 int mulMatrix[4][4] = { { 2,3,1,1 },{ 1,2,3,1, },{ 1,1,2,3 },{ 3,1,1,2 } }; 
-// Invertible polynomial (AES standard(x^8+x^4+x^3+x+1))
+// Irreducable polynomial (AES standard(x^8+x^4+x^3+x+1))
 int modVal = 0x11b; 
 //takes integer input value
 //returns the position of first 1 present in value (calculates from MSB)
@@ -23,7 +23,7 @@ int position(int value) {
 	return (count);
 }
 //Takes integer input
-//Finds mod invertible polynomial (x^8+x^4+x^3+x+1)
+//Finds mod Irreducable polynomial (x^8+x^4+x^3+x+1)
 int FindMod(int prod) {
 	//returns the value if it already can be stored in 8 bits
 	if (prod<256) {

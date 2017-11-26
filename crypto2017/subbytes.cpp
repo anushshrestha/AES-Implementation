@@ -7,10 +7,13 @@
 using namespace std;
 
 int addVar = 198;
-bool firstTime = true;
+//affineConst:Matrix to be added to the intermediate generated sBox
 int affineConst = 143;
+//(AES standard) Irreducable polynomial (x^8+x^4+x^3+x+1)
 int irreducable = 0x11B;
 
+//Takes two integer inputs and computes multiplication
+//Computes multiplication of two numbers in finite field
 int productInFiniteField(int num1, int num2) {
 
 	int i = 7;
@@ -27,8 +30,8 @@ int productInFiniteField(int num1, int num2) {
 	}
 	return (int)(prod.to_ulong());
 }
-
-
+//takes one integer input
+//finds the multiplication inverse in 2^8 galois field
 int mulInverse(int init) {
 	if (init == 0) {
 		return 0;
@@ -38,7 +41,7 @@ int mulInverse(int init) {
 	int q = 0;
 	int prev = 0;
 	int present = 1;
-
+	//Until the remainder is 1, this while loop runs
 	while (temp > 1) {
 		int q1 = 1;
 		// finding position of first 1 in the divisor
@@ -127,22 +130,19 @@ int affineTrans(int k) {
 
 	return (int)(finalVal.to_ulong());
 }
-
+//Takes 1 integer input
+// generates s box transformation for that input
+// returns the S Box transformation Value
 int sBoxGen(int value) {
 	return affineTrans(mulInverse(value));
 }
-
+//Finds sBox transformation for every value in the 4X4 state matrix
 void SubBytes(int state[][4]) {
 	for (int i = 0; i < 4; i++) {
-		/*if (i % 16 == 0) {
-			cout << endl;
-		}*/
 		for (int j = 0; j < 4; j++) {
 			// generating state using sbox
 			state[i][j] = sBoxGen(state[i][j]);
-			//cout << std::hex << state[i][j] << " ";
 		}
-		//cout << endl;
 	}
 }
 
