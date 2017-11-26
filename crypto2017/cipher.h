@@ -12,6 +12,7 @@ void AddRoundKey(int state[][4], int* roundKey, int round);
 int position(int value);
 int sBoxGen(int value);
 
+int productOfTwoNumbers(int num1, int num2);
 extern int sbox[256];
 
 const int Nr = 10; // number of rounds 

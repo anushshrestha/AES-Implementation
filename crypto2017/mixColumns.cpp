@@ -5,9 +5,9 @@
 #include <bitset>
 using namespace std;
 //Constant matrix/polynomial (AES standard)
-int mulMatrix[4][4] = { { 2,3,1,1 },{ 1,2,3,1, },{ 1,1,2,3 },{ 3,1,1,2 } }; 
+int mulMatrix[4][4] = { { 2,3,1,1 },{ 1,2,3,1, },{ 1,1,2,3 },{ 3,1,1,2 } };
 // Irreducable polynomial (AES standard(x^8+x^4+x^3+x+1))
-int modVal = 0x11b; 
+int modVal = 0x11b;
 //takes integer input value
 //returns the position of first 1 present in value (calculates from MSB)
 int position(int value) {
@@ -47,24 +47,24 @@ int FindMod(int prod) {
 }
 //Takes two integer inputs and computes multiplication
 //Computes multiplication of two numbers in finite field
-int ProductInFiniteField(int num1, int num2) {
-	//num_1, num_2: num1 and num2 in respective binary format
-	bitset<8> num_1 = num1;
-	bitset<16> num_2 = num2;
-	//final product that's necessary
-	bitset<16> prod = 0;
+/*int productOfTwoNumbers(int num1, int num2) {
+//num_1, num_2: num1 and num2 in respective binary format
+bitset<8> num_1 = num1;
+bitset<16> num_2 = num2;
+//final product that's necessary
+bitset<16> prod = 0;
 
-	int i = 7;
-	while (i >= 0) {
-		//bitwise multiplication
-		if (num_1[i] == 1) {
-			bitset<16> temp = num2 << i;
-			prod = prod ^ temp;
-		}
-		i--;
-	}
-	return (int)(prod.to_ulong());
+int i = 7;
+while (i >= 0) {
+//bitwise multiplication
+if (num_1[i] == 1) {
+bitset<16> temp = num2 << i;
+prod = prod ^ temp;
 }
+i--;
+}
+return (int)(prod.to_ulong());
+}*/
 //Mix Columns method
 //Takes state as the input
 //Does matrix multiplication with a matrix present in AES standard
@@ -76,8 +76,8 @@ void mixColumns(int state[][4]) {
 			int temp = 0;
 			for (int k = 0; k < 4; k++) {
 				//multiplying the matrices and xor-ing them to find one state
-				temp = temp ^ ProductInFiniteField(mulMatrix[i][k], state[k][j]);
-			}	
+				temp = temp ^ productOfTwoNumbers(mulMatrix[i][k], state[k][j]);
+			}
 			//finding mod, in case the value of temp exceeds what can be stored in 8 bits.
 			tempState[i][j] = FindMod(temp);
 		}

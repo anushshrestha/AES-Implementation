@@ -13,8 +13,8 @@ int affineConst = 143;
 int irreducable = 0x11B;
 
 //Takes two integer inputs and computes multiplication
-//Computes multiplication of two numbers in finite field
-int productInFiniteField(int num1, int num2) {
+//Computes multiplication of two numbers
+int productOfTwoNumbers(int num1, int num2) {
 
 	int i = 7;
 	int product = 0;
@@ -31,9 +31,9 @@ int productInFiniteField(int num1, int num2) {
 	return (int)(prod.to_ulong());
 }
 //takes one integer input
-//finds the multiplication inverse in 2^8 galois field
+//finds the multiplication inverse in 2^8 galois field using extended  algorithm
 int mulInverse(int init) {
-	if (init == 0) {
+	if (init == 0) {//0 cannot be the divisor
 		return 0;
 	}
 
@@ -64,7 +64,7 @@ int mulInverse(int init) {
 			// store previous intermediate inverse
 			prev = present;
 			// product in finite field to get the new intermediate inverse
-			present = productInFiniteField(present, q);
+			present = productOfTwoNumbers(present, q);
 			present = random ^ present;
 			int temporary = remainder;
 			remainder = init;
@@ -78,14 +78,14 @@ int mulInverse(int init) {
 	int prevTemp = prev;
 	prev = present;
 	// final inverse by finding product in finite field and xoring it with the previous intermediate inverse.
-	present = productInFiniteField(present, q);
+	present = productOfTwoNumbers(present, q);
 	present = prevTemp ^ present;
 	return present;
 }
 //takes one input
 //Bitwise Matrix multiplication and addition of the matrix
 int affineTrans(int k) {
-	// 01 doesn't have an inverse that can be represented in 8 bits.
+	// 01 doesn't have a multiplicative inverse that can be represented in 8 bits.
 	if (k == 0x11a) {
 		return 0x7c;
 	}
