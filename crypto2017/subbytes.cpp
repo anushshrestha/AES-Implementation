@@ -6,9 +6,12 @@
 #include <iostream>
 using namespace std;
 
-int addVar = 198;
 //affineConst:Matrix to be added to the intermediate generated sBox
+int addVar = 198;
 int affineConst = 143;
+
+int invAffineConst = 0x25;
+int invAddVar = 0xa0;
 //(AES standard) Irreducable polynomial (x^8+x^4+x^3+x+1)
 int irreducable = 0x11B;
 
@@ -82,19 +85,23 @@ int mulInverse(int init) {
 	present = prevTemp ^ present;
 	return present;
 }
-//takes one input
+//takes three input. 
+//The first input is the input value for which the affine tranformation has to be computed
+//The second and the third input is dependant on whether the  affine tranformation is for generation of subbytes or inverse subbytes
 //Bitwise Matrix multiplication and addition of the matrix
-int affineTrans(int k) {
+int affineTrans(int k, int affConst, int addVariable) {
 	// 01 doesn't have a multiplicative inverse that can be represented in 8 bits.
 	if (k == 0x11a) {
 		return 0x7c;
 	}
-
+	// 01's affine transformation is 7c but during sBox Generation the multiplicative inverse of 01 is not represented in 8 bit, so we change it to 0x7c, this is the inverse of that
+	if (affConst == invAffineConst && k == 0x7c) {
+		return 01;
+	}
 	int i = 0, j = 0;
-	bitset<8> prod, finalVal = 0;
-	bitset<8> affineConstBit = affineConst;
-	bitset<8> value = k;
-	prod = value;
+	bitset<8> value, finalVal = 0;
+	bitset<8> affineConstBit = affConst;
+	bitset<8> prod = k;
 
 	// reversing the bits for easy calculation
 	for (int i = 0; i < 8; i++) {
@@ -122,7 +129,7 @@ int affineTrans(int k) {
 		finalVal[7 - i] = prod[i];
 	}
 
-	bitset<8> addVarBit = addVar;
+	bitset<8> addVarBit = addVariable;
 	finalVal = finalVal ^ addVarBit;
 	prod = finalVal;
 
@@ -136,7 +143,7 @@ int affineTrans(int k) {
 // generates s box transformation for that input
 // returns the S Box transformation Value
 int sBoxGen(int value) {
-	return affineTrans(mulInverse(value));
+	return affineTrans(mulInverse(value), affineConst, addVar);
 }
 //Finds sBox transformation for every value in the 4X4 state matrix
 void SubBytes(int state[][4]) {
@@ -148,14 +155,20 @@ void SubBytes(int state[][4]) {
 	}
 }
 
-//
-//void SubBytes(int state[][4])
-//{
-//	int k = mulInverse(0x10);
-//	bitset<8> kk = k;
-//	int r = affineTrans(k);
-//	int m;
-//	m = 44;
-//	byteSub();
-//	cin >> m;
-//}
+//Generating inverse s box
+int invSBoxGen(int value) {
+	if (mulInverse(affineTrans(value, invAffineConst, invAddVar)) == 0x11a) {
+		return 0x01;
+	}
+	return mulInverse(affineTrans(value, invAffineConst, invAddVar));
+}
+//Finds inverse s box for every value in the 4X4 state matrix and stores it in the value
+void InvSubBytes(int state[][4]) {
+	for (int i = 0; i < 4; i++) {
+		for (int j = 0; j < 4; j++) {
+			// generating state using invSbox
+			state[i][j] = invSBoxGen(state[i][j]);
+		}
+	}
+}
+

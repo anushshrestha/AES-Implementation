@@ -11,7 +11,7 @@ int * KeyExpansion(int * key, int Nb);
 void AddRoundKey(int state[][4], int* roundKey, int round);
 int position(int value);
 int sBoxGen(int value);
-
+void InvSubBytes(int state[][4]);
 int productOfTwoNumbers(int num1, int num2);
 extern int sbox[256];
 
