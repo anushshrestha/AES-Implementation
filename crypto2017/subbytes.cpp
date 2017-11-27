@@ -1,30 +1,29 @@
 #include "stdafx.h"
 #include "cipher.h"
 #include <string>
-#include <vector>
 #include <bitset>
 #include <iostream>
 using namespace std;
 
 //affineConst:Matrix to be added to the intermediate generated sBox
-int addVar = 198;
-int affineConst = 143;
+const int addVar = 198;
+const int affineConst = 143;
 
-int invAffineConst = 0x25;
-int invAddVar = 0xa0;
+const int invAffineConst = 0x25;
+const int invAddVar = 0xa0;
 //(AES standard) Irreducable polynomial (x^8+x^4+x^3+x+1)
-int irreducable = 0x11B;
+const int irreducable = 0x11B;
 
 //Takes two integer inputs and computes multiplication
 //Computes multiplication of two numbers
 int productOfTwoNumbers(int num1, int num2) {
-
+	//EXP53 - CPP.Do not read uninitialized memory
 	int i = 7;
 	int product = 0;
 	bitset<16> prod = 0;
 	bitset<8> num_1 = num1;
 	bitset<16> num_2 = num2;
-
+	
 	while (i >= 0) {
 		if (num_1[i] == 1) {
 			prod = prod ^ (num_2 << i);
@@ -40,6 +39,7 @@ int mulInverse(int init) {
 		return 0;
 	}
 
+	//EXP53 - CPP.Do not read uninitialized memory
 	int remainder = irreducable;
 	int q = 0;
 	int prev = 0;
@@ -142,6 +142,7 @@ int affineTrans(int k, int affConst, int addVariable) {
 //Takes 1 integer input
 // generates s box transformation for that input
 // returns the S Box transformation Value
+// // avoid memory access : preventing cache timing attack
 int sBoxGen(int value) {
 	return affineTrans(mulInverse(value), affineConst, addVar);
 }

@@ -2,16 +2,16 @@
 #include <iostream>
 #include "stdint.h"
 #include <string>
-#include <vector>
 #include "stdio.h"
 #include "cipher.h"
 using namespace std;
 
 // Shift row r of state S left by r bytes
 void ShiftRows(int state[][4])
-{
-	int Nb = 4;
-	int temp[4];
+{	
+	//MSC53 - CPP.Do not return from a function declared
+	//EXP53 - CPP.Do not read uninitialized memory
+	int temp[4] = { 0 }; //DCL30-C. Declare objects with appropriate storage durations
 	// No need to shift first row.
 	for (int row = 1; row < Nb; row++) {
 		for (int column = 0; column < Nb; column++) {
@@ -31,8 +31,9 @@ void ShiftRows(int state[][4])
 // Shift row r of state S right by r bytes
 void InvShiftRows(int state[][4])
 {
-	int Nb = 4;
-	int temp[4];
+	//MSC53 - CPP.Do not return from a function declared
+	//EXP53 - CPP.Do not read uninitialized memory
+	int temp[4] = { 0 }; //DCL30-C. Declare objects with appropriate storage durations
 	// No need to shift first row.
 	for (int row = 1; row < Nb; row++) {
 		for (int column = 0; column < Nb; column++) {

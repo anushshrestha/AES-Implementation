@@ -6,7 +6,7 @@
 
 using namespace std;
 
-int expandedKey[176];
+int expandedKey[176] = { 0 };//DCL30-C. Declare objects with appropriate storage durations
 
 int Rcon[255] = {
 	0x8d, 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1b, 0x36, 0x6c, 0xd8, 0xab, 0x4d, 0x9a,
@@ -37,6 +37,7 @@ void rotateWord(int * word) {
 }
 
 // Apply SBox to state
+//avoid memory access
 void substituteWord(int * word) {
 	word[0] = sBoxGen(word[0]);
 	word[1] = sBoxGen(word[1]);

@@ -1,18 +1,20 @@
 #include "stdafx.h"
 #include "cipher.h"
 #include <iostream>
-
 #include <bitset>
+
 using namespace std;
 //Constant matrix/polynomial (AES standard)
-int mulMatrix[4][4] = { { 2,3,1,1 },{ 1,2,3,1, },{ 1,1,2,3 },{ 3,1,1,2 } };
-int invMulMatrix[4][4] = { {0x0E,0x0B,0x0D,0x09},{ 0x09, 0x0E, 0x0B, 0x0D},{0x0D, 0x09, 0x0E, 0x0B},{ 0x0B, 0x0D, 0x09, 0x0E} };
+//DCL30 - C.Declare objects with appropriate storage durations
+const int mulMatrix[4][4] = { { 2,3,1,1 },{ 1,2,3,1, },{ 1,1,2,3 },{ 3,1,1,2 } };
+const int invMulMatrix[4][4] = { {0x0E,0x0B,0x0D,0x09},{ 0x09, 0x0E, 0x0B, 0x0D},{0x0D, 0x09, 0x0E, 0x0B},{ 0x0B, 0x0D, 0x09, 0x0E} };
 // Irreducable polynomial (AES standard(x^8+x^4+x^3+x+1))
-int modVal = 0x11b;
+const int modVal = 0x11b;
+
 //takes integer input value
 //returns the position of first 1 present in value (calculates from MSB)
 int position(int value) {
-	int count = 15;
+	int count = 15; //EXP53-CPP. Do not read uninitialized memory
 	bitset <16> x = value;
 	while (count >= 0) {
 		if (x[count] == 1) {
@@ -51,10 +53,10 @@ int FindMod(int prod) {
 //Does matrix multiplication with a matrix present in AES standard
 void mixColumns(int state[][4]) {
 	//TempState is the temporary state where updated state values are stored after finding the product of the two matrices which will later be transfered to state
-	int tempState[4][4];
+	int tempState[4][4] = { 0 }; //EXP53 - CPP.Do not read uninitialized memory
 	for (int i = 0; i < 4; i++) {
 		for (int j = 0; j < 4; j++) {
-			int temp = 0;
+			int temp = 0; //EXP53 - CPP.Do not read uninitialized memory
 			for (int k = 0; k < 4; k++) {
 				//multiplying the matrices and xor-ing them to find one state
 				temp = temp ^ productOfTwoNumbers(mulMatrix[i][k], state[k][j]);
@@ -69,13 +71,15 @@ void mixColumns(int state[][4]) {
 			state[i][j] = tempState[i][j];
 		}
 	}
+
+	//MSC53 - CPP.Do not return from a function declared
 }
 void InvMixColumns(int state[][4]) {
 	//TempState is the temporary state where updated state values are stored after finding the product of the two matrices which will later be transfered to state
-	int tempState[4][4];
+	int tempState[4][4] = { 0 }; //EXP53 - CPP.Do not read uninitialized memory
 	for (int i = 0; i < 4; i++) {
 		for (int j = 0; j < 4; j++) {
-			int temp = 0;
+			int temp = 0; //EXP53 - CPP.Do not read uninitialized memory
 			for (int k = 0; k < 4; k++) {
 				//multiplying the matrices and xor-ing them to find one state
 				temp = temp ^ productOfTwoNumbers(invMulMatrix[i][k], state[k][j]);
@@ -101,4 +105,5 @@ void AddRoundKey(int state[][4], int * roundKey, int round) {
 			state[row][col] ^= roundKey[round * Nb * 4 + col * Nb + row];
 		}
 	}
+	//MSC53 - CPP.Do not return from a function declared
 }
