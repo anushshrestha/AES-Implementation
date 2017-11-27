@@ -6,13 +6,14 @@
 using namespace std;
 //Constant matrix/polynomial (AES standard)
 int mulMatrix[4][4] = { { 2,3,1,1 },{ 1,2,3,1, },{ 1,1,2,3 },{ 3,1,1,2 } };
+int invMulMatrix[4][4] = { {0x0E,0x0B,0x0D,0x09},{ 0x09, 0x0E, 0x0B, 0x0D},{0x0D, 0x09, 0x0E, 0x0B},{ 0x0B, 0x0D, 0x09, 0x0E} };
 // Irreducable polynomial (AES standard(x^8+x^4+x^3+x+1))
 int modVal = 0x11b;
 //takes integer input value
 //returns the position of first 1 present in value (calculates from MSB)
 int position(int value) {
-	int count = 8;
-	bitset <9> x = value;
+	int count = 15;
+	bitset <16> x = value;
 	while (count >= 0) {
 		if (x[count] == 1) {
 			return count;
@@ -57,6 +58,27 @@ void mixColumns(int state[][4]) {
 			for (int k = 0; k < 4; k++) {
 				//multiplying the matrices and xor-ing them to find one state
 				temp = temp ^ productOfTwoNumbers(mulMatrix[i][k], state[k][j]);
+			}
+			//finding mod, in case the value of temp exceeds what can be stored in 8 bits.
+			tempState[i][j] = FindMod(temp);
+		}
+	}
+	//Updating state
+	for (int i = 0; i < 4; i++) {
+		for (int j = 0; j < 4; j++) {
+			state[i][j] = tempState[i][j];
+		}
+	}
+}
+void InvMixColumns(int state[][4]) {
+	//TempState is the temporary state where updated state values are stored after finding the product of the two matrices which will later be transfered to state
+	int tempState[4][4];
+	for (int i = 0; i < 4; i++) {
+		for (int j = 0; j < 4; j++) {
+			int temp = 0;
+			for (int k = 0; k < 4; k++) {
+				//multiplying the matrices and xor-ing them to find one state
+				temp = temp ^ productOfTwoNumbers(invMulMatrix[i][k], state[k][j]);
 			}
 			//finding mod, in case the value of temp exceeds what can be stored in 8 bits.
 			tempState[i][j] = FindMod(temp);
