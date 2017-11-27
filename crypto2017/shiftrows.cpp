@@ -29,7 +29,7 @@ void ShiftRows(int state[][4])
 }
 
 // Shift row r of state S right by r bytes
-void InverseShiftRows(int state[][4])
+void InvShiftRows(int state[][4])
 {
 	int Nb = 4;
 	int temp[4];
